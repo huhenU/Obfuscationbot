@@ -13,7 +13,7 @@ class MyClient(discord.Client):
 
     async def on_message(self, message):
         global numberoft
-        if str(message.channel.id) == '613134424757895187':
+        if str(message.channel.id) == 'channel_id':
             if message.author != client.user:
                 if message.content.startswith('<<iterations'):
                     strsplit = message.content.split()
