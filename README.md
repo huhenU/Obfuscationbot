@@ -6,5 +6,5 @@ This is a Discord Bot that runs a message through a translator a few times, back
 
 ## How do I set this up?
 
-Edit botconfig.json to include your bot-token and a channel ID. The bot will only respond to messages in that channel to avoid spam.
-Also edit index.js to inclued your translator-API-token
+Edit bot.py to include your bot-token, Yandex-Translate API key and a channel ID. The bot will only respond to messages in that channel to avoid spam.
+After starting the bot, change the amount of iterations by typing <<iterations <number>. This can be changed at any time.
