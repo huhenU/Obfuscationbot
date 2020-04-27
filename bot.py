@@ -1,9 +1,9 @@
 import discord
 import json
 import random
-from Yandex import Translate
+from googletrans import Translator
 
-translate = Translate(api_key='translate_api_key')
+translator = Translator()
 
 class MyClient(discord.Client):
     async def on_ready(self):
@@ -20,17 +20,17 @@ class MyClient(discord.Client):
                     numberoft = int(strsplit[1])
                     await message.channel.send('Number of iterations set to ' + strsplit[1])
                     return;
-                translatedText = message.content
+                originalText = message.content
                 for i in range(numberoft):
-                    l1 = random.randint(1, 93)
+                    l1 = random.randint(1, 29)
                     with open('languaged.json') as lang_strings:
                         data = json.load(lang_strings)
                         languagesd = data[str(l1)]
-                    translatedText = translate.translate(translatedText, languagesd)
-                    print(translatedText)
+                    translatedText = translator.translate(originalText, dest=languagesd)
+                    print(translatedText.text)
 
-                translatedText2 = translate.translate(translatedText, 'en')
-                await message.channel.send(translatedText2)
+                translatedText2 = translator.translate(translatedText.text, dest='en')
+                await message.channel.send(translatedText2.text)
 
 client = MyClient()
 client.run('Discord_bot_token')
