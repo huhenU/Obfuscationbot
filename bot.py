@@ -4,7 +4,7 @@ import random
 from googletrans import Translator
 
 translator = Translator()
-
+numberoft = ""
 class MyClient(discord.Client):
     async def on_ready(self):
         print('Logged on as {0}!'.format(self.user))
@@ -19,6 +19,9 @@ class MyClient(discord.Client):
                     strsplit = message.content.split()
                     numberoft = int(strsplit[1])
                     await message.channel.send('Number of iterations set to ' + strsplit[1])
+                    return;
+                if numberoft == "":
+                    await message.channel.send("Please set the amount of iterations with <<iterations [amount] first.")
                     return;
                 originalText = message.content
                 for i in range(numberoft):
