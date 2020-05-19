@@ -7,13 +7,17 @@ translator = Translator()
 mainwindow = Tk()
 mainwindow.title('Obfuscator')
 mainwindow.iconbitmap('assets/icon.ico')
+mainwindow.geometry("600x450+536+292")
+mainwindow.minsize(120, 1)
+mainwindow.maxsize(3844, 1061)
+mainwindow.resizable(1, 1)
 
 customlanguages = ""
 langfilename = 'assets/languages.json'
 langamount = 85
 
-text=Text(mainwindow)
-text.grid()
+text = Text(mainwindow)
+text.place(relx=0.017, rely=0.022, relheight=0.698, relwidth=0.957)
 
 def obfuscate():
     print(customlanguages)
@@ -52,7 +56,7 @@ def obfuscate():
     TranslText = Text(outputwindow)
     TranslText.grid()
     TranslText.insert(END, translatedText2.text)
-    buttonCpy = Button(outputwindow, height=1, width=50, text="Copy Output", command=copyoutput)
+    buttonCpy = Button(outputwindow, height=3, width=80, text="Copy Output", command=copyoutput)
     buttonCpy.grid()
 
 def iterations():
@@ -72,18 +76,6 @@ def customlanguagesoption():
     numberofiterations = len(customlanguages.split(' '))
     print('Number of iterations automatically set to ' + str(numberofiterations))
     
-
-def moreoptions():
-    optionwindow = Toplevel()
-    optionwindow.title('Options')
-    optionwindow.iconbitmap('assets/icon.ico')
-    buttonIT = Button(optionwindow, height=2, width=25, text="Iterations (All random)", command=iterations)
-    buttonCS = Button(optionwindow, height=2, width=25, text="Custom Languages", command=customlanguagesoption)
-    buttonClearCS = Button(optionwindow, height=2, width=25, text="Set Custom language file", command=usecustomlanguagefile)
-    buttonIT.grid()
-    buttonCS.grid()
-    buttonClearCS.grid()
-
 def usecustomlanguagefile():
     global langfilename
     global langamount
@@ -98,9 +90,13 @@ def copyoutput():
     pyperclip.copy(translatedText2.text)
 
 button1 = Button(mainwindow, height=1, width=100, text="Obfuscate", command=obfuscate)
-button2 = Button(mainwindow, height=1, width=100, text="Options and Iterations", command=moreoptions)
-button1.grid()
-button2.grid()
+button2 = Button(mainwindow, height=1, width=100, text="Custom Languages", command=customlanguagesoption)
+buttonIT = Button(mainwindow, height=1, width=100, text="Iterations (All random)", command=iterations)
+buttonClearCS = Button(mainwindow, height=1, width=100, text="Set Custom language file", command=usecustomlanguagefile)
+button1.place(relx=0.017, rely=0.733, height=64, width=577)
+button2.place(relx=0.017, rely=0.889, height=44, width=187)
+buttonIT.place(relx=0.333, rely=0.889, height=44, width=197)
+buttonClearCS.place(relx=0.667, rely=0.889, height=44, width=187)
 
 mainwindow.mainloop()
 
