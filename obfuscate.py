@@ -95,7 +95,9 @@ def filetranslate():
     global translatefilename
     translatefilename = askopenfilename(filetypes=(("Text File", "*.txt"),
                                               ("All files", "*.*") ))
-    print(translatefilename + ' selected') 
+    print(translatefilename + ' selected')
+    text.delete(1.0,END)
+    text.insert(1.0,'Translating document')
 
 def copyoutput():
     pyperclip.copy(translatedText2.text)
