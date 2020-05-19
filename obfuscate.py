@@ -1,10 +1,8 @@
 from tkinter import *
 from tkinter.simpledialog import askstring
-from googletrans import Translator
 from tkinter.filedialog import askopenfilename
-import random
-import json
-import pyperclip
+from googletrans import Translator
+import random, json, pyperclip
 translator = Translator()
 mainwindow = Tk()
 mainwindow.title('Obfuscator')
