@@ -1,10 +1,13 @@
-# Discord Obfuscation Bot
+# Python Obfuscator
 
 ## What's this?
 
-This is a Discord Bot that runs a message through a translator a few times, back to English and then returns that.
+This is a python script that runs a message through Google Translate multiple times, then translates it back to English. This will result in a nonsensical version of your input text.
 
-## How do I set this up?
+## How do I use this?
 
-Edit bot.py to include your bot-token and a channel ID. The bot will only respond to messages in that channel to avoid spam.
-After starting the bot, change the amount of iterations by typing <<iterations <number>. This can be changed at any time.
+1. Install the dependencies googletrans (for translation) and pyperclip (to copy the output)
+2. Run the .py script. You will be able to configure the following things:
+ - Iterations (All random): This will change the number of times your text is translated. Using this option, all custom languages will be disabled.
+ - Custom Languages: You can use this to force languages for translations. Example: `de fr it rand` will translate your text into German, French, Italian and a randomly selected language.
+ - Set Custom language file: Allows you to specify a file with languages possible to translate to. By default, the file assets/languages.json is used.
