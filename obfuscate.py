@@ -14,14 +14,17 @@ mainwindow.resizable(1, 1)
 
 customlanguages = ""
 translatefilename= ""
-langfilename = 'assets/languages.json'
+langfilename = 'assets/languages.txt'
 langamount = 85
 
 text = Text(mainwindow)
 text.place(relx=0.017, rely=0.022, relheight=0.698, relwidth=0.957)
 
 def obfuscate():
-    print(customlanguages)
+    openedfile = open(langfilename, 'r')
+    openedfileread = openedfile.read()
+    customlanguagesread = openedfileread.split(', ')
+    print(customlanguagesread)
     if translatefilename != "":
         translatefileopen = open(translatefilename, 'r')
         originalText = translatefileopen.read()
@@ -35,23 +38,18 @@ def obfuscate():
             forcelanguage = customlanguages.split(' ')
             languagesd = forcelanguage[customnum]
             if languagesd == "rand":
-                language = random.randint(1, langamount)
-                with open(langfilename) as lang_strings:
-                    data = json.load(lang_strings)
-                    languagesd = data[str(language)]
+                languagesd = random.choice(customlanguagesread)
             customnum += 1
         else:
-            language = random.randint(1, langamount)
-        with open(langfilename) as lang_strings:
-            data = json.load(lang_strings)
-            if customlanguages == "":
-                languagesd = data[str(language)]
-            print('Translating to language: ' + languagesd)
-            translatedText = translator.translate(originalText, dest=languagesd)
-            print('Output: ' + translatedText.text + '\n')
-            originalText = translatedText.text
-            global translatedText2
-            translatedText2 = translator.translate(translatedText.text, dest='en')
+            languagesd = random.choice(customlanguagesread)
+            
+        print('Translating to language: ' + languagesd)
+        translatedText = translator.translate(originalText, dest=languagesd)
+        print('Output: ' + translatedText.text + '\n')
+        originalText = translatedText.text
+        global translatedText2
+        print('HI!')
+        translatedText2 = translator.translate(translatedText.text, dest='en')
             
     customnum = 0
     print('Final output: ' + translatedText2.text)
@@ -84,12 +82,12 @@ def customlanguagesoption():
 def usecustomlanguagefile():
     global langfilename
     global langamount
-    langfilename = askopenfilename(filetypes=(("JSON File", "*.json"),
+    langfilename = askopenfilename(filetypes=(("Text File", "*.txt"),
                                               ("All files", "*.*") ))
-    with open(langfilename) as lang_strings:
-        data = json.load(lang_strings)
-        langamount = len(data)
-        print('Detected ' + str(langamount) + ' entries in file. Successfully set custom language file.')
+    openedfile = open(langfilename,'r')
+    openedfileread = openedfile.read()
+    customlanguagesread = openedfileread.split(', ')
+    print('Detected ' + str(len(customlanguagesread)) + ' entries in file. Successfully set custom language file.')
 
 def filetranslate():
     global translatefilename
