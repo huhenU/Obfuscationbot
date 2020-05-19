@@ -1,4 +1,5 @@
 from tkinter import *
+import tkinter as tk
 from tkinter.simpledialog import askstring
 from tkinter.filedialog import askopenfilename
 from googletrans import Translator
@@ -12,6 +13,8 @@ mainwindow.minsize(120, 1)
 mainwindow.maxsize(3844, 1061)
 mainwindow.resizable(1, 1)
 
+proxyenabled = tk.IntVar()
+proxystring = ""
 customlanguages = ""
 translatefilename= ""
 langfilename = 'assets/languages.txt'
@@ -44,13 +47,22 @@ def obfuscate():
             languagesd = random.choice(customlanguagesread)
             
         print('Translating to language: ' + languagesd)
-        translatedText = translator.translate(originalText, dest=languagesd)
+        if proxyenabled.get() == 1:
+            translator = Translator(proxies=proxystring)
+            translatedText = translator.translate(originalText, dest=languagesd)
+        else:
+            translator = Translator()
+            translatedText = translator.translate(originalText, dest=languagesd)
         print('Output: ' + translatedText.text + '\n')
         originalText = translatedText.text
         global translatedText2
-        print('HI!')
-        translatedText2 = translator.translate(translatedText.text, dest='en')
-            
+        if proxyenabled.get() == 1:
+            translator = Translator(proxies=proxystring)
+            translatedText2 = translator.translate(translatedText.text, dest='en')
+        else:
+            translator = Translator()
+            translatedText2 = translator.translate(translatedText.text, dest='en')
+        
     customnum = 0
     print('Final output: ' + translatedText2.text)
     outputwindow = Toplevel()
@@ -63,6 +75,7 @@ def obfuscate():
     buttonCpy.grid()
 
 def iterations():
+    print(proxyenabled.get())
     iterationsprompt = askstring('Iterations', "Enter the amount of iterations")
     global numberofiterations
     global customlanguages
@@ -100,16 +113,27 @@ def filetranslate():
 def copyoutput():
     pyperclip.copy(translatedText2.text)
 
+def setproxy():
+    if proxyenabled.get() == 1:
+        proxyprompt = askstring('Proxy', "Enter your Proxy domain")
+        global proxystring
+        proxystring = proxyprompt
+        return print('Proxy successfully set to ' + proxystring)
+
 button1 = Button(mainwindow, height=1, width=100, text="Obfuscate", command=obfuscate)
 button2 = Button(mainwindow, height=1, width=100, text="Custom Languages", command=customlanguagesoption)
 buttonIT = Button(mainwindow, height=1, width=100, text="Iterations (All random)", command=iterations)
 buttonClearCS = Button(mainwindow, height=1, width=100, text="Set Custom language file", command=usecustomlanguagefile)
 buttonFileTR = Button(mainwindow, height=1, width=100, text="Translate File", command=filetranslate)
-button1.place(relx=0.017, rely=0.733, height=64, width=577)
-button2.place(relx=0.017, rely=0.889, height=44, width=157)
+Checkbutton1 = tk.Checkbutton(mainwindow)
+button1.place(relx=0.017, rely=0.733, height=64, width=467)
+button2.place(relx=0.017, rely=0.889, height=44, width=147)
 buttonIT.place(relx=0.283, rely=0.889, height=44, width=147)
-buttonClearCS.place(relx=0.533, rely=0.889, height=44, width=147)
-buttonFileTR.place(relx=0.783, rely=0.889, height=44, width=117)
+buttonClearCS.place(relx=0.55, rely=0.889, height=44, width=147)
+buttonFileTR.place(relx=0.8, rely=0.733, height=64, width=107)
+Checkbutton1.configure(text="Use proxy")
+Checkbutton1.configure(variable=proxyenabled, onvalue=1, offvalue=0, command=setproxy)
+Checkbutton1.place(relx=0.817, rely=0.911, relheight=0.056, relwidth=0.133)
 
 mainwindow.mainloop()
 
