@@ -13,6 +13,7 @@ mainwindow.maxsize(3844, 1061)
 mainwindow.resizable(1, 1)
 
 customlanguages = ""
+translatefilename= ""
 langfilename = 'assets/languages.json'
 langamount = 85
 
@@ -21,8 +22,12 @@ text.place(relx=0.017, rely=0.022, relheight=0.698, relwidth=0.957)
 
 def obfuscate():
     print(customlanguages)
-    global text
-    originalText = text.get("1.0", "end")
+    if translatefilename != "":
+        translatefileopen = open(translatefilename, 'r')
+        originalText = translatefileopen.read()
+    else:  
+        global text
+        originalText = text.get("1.0", "end")
     global customnum
     customnum = 0
     for i in range(numberofiterations):
@@ -86,6 +91,12 @@ def usecustomlanguagefile():
         langamount = len(data)
         print('Detected ' + str(langamount) + ' entries in file. Successfully set custom language file.')
 
+def filetranslate():
+    global translatefilename
+    translatefilename = askopenfilename(filetypes=(("Text File", "*.txt"),
+                                              ("All files", "*.*") ))
+    print(translatefilename + ' selected') 
+
 def copyoutput():
     pyperclip.copy(translatedText2.text)
 
@@ -93,10 +104,12 @@ button1 = Button(mainwindow, height=1, width=100, text="Obfuscate", command=obfu
 button2 = Button(mainwindow, height=1, width=100, text="Custom Languages", command=customlanguagesoption)
 buttonIT = Button(mainwindow, height=1, width=100, text="Iterations (All random)", command=iterations)
 buttonClearCS = Button(mainwindow, height=1, width=100, text="Set Custom language file", command=usecustomlanguagefile)
+buttonFileTR = Button(mainwindow, height=1, width=100, text="Translate File", command=filetranslate)
 button1.place(relx=0.017, rely=0.733, height=64, width=577)
-button2.place(relx=0.017, rely=0.889, height=44, width=187)
-buttonIT.place(relx=0.333, rely=0.889, height=44, width=197)
-buttonClearCS.place(relx=0.667, rely=0.889, height=44, width=187)
+button2.place(relx=0.017, rely=0.889, height=44, width=157)
+buttonIT.place(relx=0.283, rely=0.889, height=44, width=147)
+buttonClearCS.place(relx=0.533, rely=0.889, height=44, width=147)
+buttonFileTR.place(relx=0.783, rely=0.889, height=44, width=117)
 
 mainwindow.mainloop()
 
