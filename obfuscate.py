@@ -4,7 +4,7 @@ from tkinter.simpledialog import askstring
 from tkinter.filedialog import askopenfilename
 from googletrans import Translator
 import random, json, pyperclip
-translator = Translator()
+
 mainwindow = Tk()
 mainwindow.title('Obfuscator')
 mainwindow.iconbitmap('assets/icon.ico')
@@ -23,7 +23,15 @@ langamount = 85
 text = Text(mainwindow)
 text.place(relx=0.017, rely=0.022, relheight=0.698, relwidth=0.957)
 
-def obfuscate():    
+def obfuscate():
+    if proxyenabled.get() == 1:
+        ProxyDict = {
+                'https': proxystring
+                }
+        translator = Translator(proxies=ProxyDict)
+    else:
+        translator = Translator()
+       
     openedfile = open(langfilename, 'r')
     openedfileread = openedfile.read()
     customlanguagesread = openedfileread.split(', ')
@@ -46,24 +54,12 @@ def obfuscate():
             languagesd = random.choice(customlanguagesread)
             
         print('Translating to language: ' + languagesd)
-        if proxyenabled.get() == 1:
-            ProxyDict = {
-                'https': proxystring
-                }
-            translatorProxy = Translator(proxies=ProxyDict)
-            translatedText = translatorProxy.translate(originalText, dest=languagesd)
-        else:
-            translator = Translator()
-            translatedText = translator.translate(originalText, dest=languagesd)
+        translatedText = translator.translate(originalText, dest=languagesd)
+
         print('Output: ' + translatedText.text + '\n')
         originalText = translatedText.text
         global translatedText2
-        if proxyenabled.get() == 1:
-            translatorProxy = Translator(proxies=ProxyDict)
-            translatedText2 = translatorProxy.translate(translatedText.text, dest='en')
-        else:
-            translator = Translator()
-            translatedText2 = translator.translate(translatedText.text, dest='en')
+        translatedText2 = translator.translate(translatedText.text, dest='en')
         
     customnum = 0
     print('Final output: ' + translatedText2.text)
