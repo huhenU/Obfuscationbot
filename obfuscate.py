@@ -8,7 +8,7 @@ import random, json, pyperclip
 mainwindow = Tk()
 mainwindow.title('Obfuscator')
 mainwindow.iconbitmap('assets/icon.ico')
-mainwindow.geometry("600x450+536+292")
+mainwindow.geometry("649x450+553+314")
 mainwindow.minsize(120, 1)
 mainwindow.maxsize(3844, 1061)
 mainwindow.resizable(1, 1)
@@ -21,10 +21,14 @@ langfilename = 'assets/languages.txt'
 langamount = 85
 
 text = Text(mainwindow)
-text.place(relx=0.017, rely=0.022, relheight=0.698, relwidth=0.957)
+text.place(relx=0.015, rely=0.022, relheight=0.698, relwidth=0.972)
+proxytext = Entry(mainwindow)
+proxytext.place(relx=0.832, rely=0.756,height=20, relwidth=0.16)
+proxytext.insert(END,'Proxy-Domain')
 
 def obfuscate():
     if proxyenabled.get() == 1:
+        proxystring = proxytext.get()
         ProxyDict = {
                 'https': proxystring
                 }
@@ -110,27 +114,21 @@ def filetranslate():
 def copyoutput():
     pyperclip.copy(translatedText2.text)
 
-def setproxy():
-    if proxyenabled.get() == 1:
-        proxyprompt = askstring('Proxy', "Enter your Proxy domain")
-        global proxystring
-        proxystring = proxyprompt
-        return print('Proxy successfully set to ' + proxystring)
-
 button1 = Button(mainwindow, height=1, width=100, text="Obfuscate", command=obfuscate)
 button2 = Button(mainwindow, height=1, width=100, text="Custom Languages", command=customlanguagesoption)
 buttonIT = Button(mainwindow, height=1, width=100, text="Iterations (All random)", command=iterations)
 buttonClearCS = Button(mainwindow, height=1, width=100, text="Set Custom language file", command=usecustomlanguagefile)
 buttonFileTR = Button(mainwindow, height=1, width=100, text="Translate File", command=filetranslate)
-Checkbutton1 = tk.Checkbutton(mainwindow)
-button1.place(relx=0.017, rely=0.733, height=64, width=497)
-button2.place(relx=0.017, rely=0.889, height=44, width=147)
-buttonIT.place(relx=0.267, rely=0.889, height=44, width=147)
-buttonClearCS.place(relx=0.517, rely=0.889, height=44, width=147)
-buttonFileTR.place(relx=0.767, rely=0.889, height=44, width=127)
-Checkbutton1.configure(text="Use proxy")
-Checkbutton1.configure(variable=proxyenabled, onvalue=1, offvalue=0, command=setproxy)
-Checkbutton1.place(relx=0.85, rely=0.778, relheight=0.056, relwidth=0.133)
+Proxybutton = tk.Checkbutton(mainwindow)
+
+button1.place(relx=0.015, rely=0.733, height=64, width=527)
+button2.place(relx=0.015, rely=0.889, height=44, width=157)
+buttonIT.place(relx=0.262, rely=0.889, height=44, width=157)
+buttonClearCS.place(relx=0.508, rely=0.889, height=44, width=157)
+buttonFileTR.place(relx=0.755, rely=0.889, height=44, width=157)
+Proxybutton.configure(text="Use proxy")
+Proxybutton.configure(variable=proxyenabled, onvalue=1, offvalue=0)
+Proxybutton.place(relx=0.832, rely=0.8, relheight=0.078, relwidth=0.16)
 
 
 mainwindow.mainloop()
