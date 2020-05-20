@@ -23,7 +23,7 @@ langamount = 85
 text = Text(mainwindow)
 text.place(relx=0.017, rely=0.022, relheight=0.698, relwidth=0.957)
 
-def obfuscate():
+def obfuscate():    
     openedfile = open(langfilename, 'r')
     openedfileread = openedfile.read()
     customlanguagesread = openedfileread.split(', ')
@@ -48,8 +48,11 @@ def obfuscate():
             
         print('Translating to language: ' + languagesd)
         if proxyenabled.get() == 1:
-            translator = Translator(proxies=proxystring)
-            translatedText = translator.translate(originalText, dest=languagesd)
+            ProxyDict = {
+                'https': proxystring
+                }
+            translatorProxy = Translator(proxies=ProxyDict)
+            translatedText = translatorProxy.translate(originalText, dest=languagesd)
         else:
             translator = Translator()
             translatedText = translator.translate(originalText, dest=languagesd)
@@ -57,8 +60,8 @@ def obfuscate():
         originalText = translatedText.text
         global translatedText2
         if proxyenabled.get() == 1:
-            translator = Translator(proxies=proxystring)
-            translatedText2 = translator.translate(translatedText.text, dest='en')
+            translatorProxy = Translator(proxies=ProxyDict)
+            translatedText2 = translatorProxy.translate(translatedText.text, dest='en')
         else:
             translator = Translator()
             translatedText2 = translator.translate(translatedText.text, dest='en')
@@ -75,7 +78,6 @@ def obfuscate():
     buttonCpy.grid()
 
 def iterations():
-    print(proxyenabled.get())
     iterationsprompt = askstring('Iterations', "Enter the amount of iterations")
     global numberofiterations
     global customlanguages
@@ -126,14 +128,15 @@ buttonIT = Button(mainwindow, height=1, width=100, text="Iterations (All random)
 buttonClearCS = Button(mainwindow, height=1, width=100, text="Set Custom language file", command=usecustomlanguagefile)
 buttonFileTR = Button(mainwindow, height=1, width=100, text="Translate File", command=filetranslate)
 Checkbutton1 = tk.Checkbutton(mainwindow)
-button1.place(relx=0.017, rely=0.733, height=64, width=467)
+button1.place(relx=0.017, rely=0.733, height=64, width=497)
 button2.place(relx=0.017, rely=0.889, height=44, width=147)
-buttonIT.place(relx=0.283, rely=0.889, height=44, width=147)
-buttonClearCS.place(relx=0.55, rely=0.889, height=44, width=147)
-buttonFileTR.place(relx=0.8, rely=0.733, height=64, width=107)
+buttonIT.place(relx=0.267, rely=0.889, height=44, width=147)
+buttonClearCS.place(relx=0.517, rely=0.889, height=44, width=147)
+buttonFileTR.place(relx=0.767, rely=0.889, height=44, width=127)
 Checkbutton1.configure(text="Use proxy")
 Checkbutton1.configure(variable=proxyenabled, onvalue=1, offvalue=0, command=setproxy)
-Checkbutton1.place(relx=0.817, rely=0.911, relheight=0.056, relwidth=0.133)
+Checkbutton1.place(relx=0.85, rely=0.778, relheight=0.056, relwidth=0.133)
+
 
 mainwindow.mainloop()
 
