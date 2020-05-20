@@ -27,7 +27,6 @@ def obfuscate():
     openedfile = open(langfilename, 'r')
     openedfileread = openedfile.read()
     customlanguagesread = openedfileread.split(', ')
-    print(customlanguagesread)
     if translatefilename != "":
         translatefileopen = open(translatefilename, 'r')
         originalText = translatefileopen.read()
