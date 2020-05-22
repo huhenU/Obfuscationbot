@@ -19,6 +19,7 @@ customlanguages = ""
 translatefilename= ""
 langfilename = 'assets/languages.txt'
 langamount = 85
+iterationsdefined = ""
 
 text = Text(mainwindow)
 text.place(relx=0.015, rely=0.022, relheight=0.698, relwidth=0.972)
@@ -27,6 +28,15 @@ proxytext.place(relx=0.832, rely=0.756,height=20, relwidth=0.16)
 proxytext.insert(END,'Proxy-Domain')
 
 def obfuscate():
+    global text
+    global translatefilename
+    
+    if iterationsdefined == "":
+        return tk.messagebox.showerror(title='Error', message="Please enter an amount of iterations first or specify languages")
+    
+    if len(text.get('1.0', 'end')) - 1 < 1:
+       return tk.messagebox.showerror(title='Error', message="Please enter text before clicking the obfuscate button.")
+    
     if proxyenabled.get() == 1:
         proxystring = proxytext.get()
         ProxyDict = {
@@ -43,7 +53,7 @@ def obfuscate():
         translatefileopen = open(translatefilename, 'r')
         originalText = translatefileopen.read()
     else:  
-        global text
+        
         originalText = text.get("1.0", "end")
     global customnum
     customnum = 0
@@ -66,6 +76,9 @@ def obfuscate():
         translatedText2 = translator.translate(translatedText.text, dest='en')
         
     customnum = 0
+    if translatefilename != "":
+        translatefilename = ""
+        text.delete('1.0',END)
     print('Final output: ' + translatedText2.text)
     outputwindow = Toplevel()
     outputwindow.title("Obfuscated text")
@@ -80,8 +93,14 @@ def iterations():
     iterationsprompt = askstring('Iterations', "Enter the amount of iterations")
     global numberofiterations
     global customlanguages
+    global iterationsdefined
     numberofiterations = int(iterationsprompt)
+    if numberofiterations < 1:
+        tk.messagebox.showerror(title='Error', message='Enter a number larger than 0')
+        return iterations()
+        
     customlanguages = ''
+    iterationsdefined = "yes"
     print('Cleared custom languages in case any were set')
     print('Number of iterations set to ' + str(numberofiterations))
 
@@ -89,24 +108,39 @@ def customlanguagesoption():
     customlangprompt = askstring('Custom Languages', 'What custom languages do you want to use?')
     global customlanguages
     global numberofiterations
+    global iterationsdefined
+    if len(str(customlangprompt)) < 2:
+        return tk.messagebox.showerror(title='Error', message="Input is too short to contain valid languages.")
     customlanguages = str(customlangprompt)
     numberofiterations = len(customlanguages.split(' '))
+    iterationsdefined = "yes"
     print('Number of iterations automatically set to ' + str(numberofiterations))
     
 def usecustomlanguagefile():
     global langfilename
     global langamount
-    langfilename = askopenfilename(filetypes=(("Text File", "*.txt"),
+    langfilenameask = askopenfilename(filetypes=(("Text File", "*.txt"),
                                               ("All files", "*.*") ))
-    openedfile = open(langfilename,'r')
+    openedfile = open(langfilenameask,'r')
     openedfileread = openedfile.read()
+    if len(openedfileread) < 2:
+        return tk.messagebox.showerror(title='Error', message="Text in file is too short to contain correct languages.")
+
     customlanguagesread = openedfileread.split(', ')
+    langfilename = langfilenameask
     print('Detected ' + str(len(customlanguagesread)) + ' entries in file. Successfully set custom language file.')
 
 def filetranslate():
     global translatefilename
-    translatefilename = askopenfilename(filetypes=(("Text File", "*.txt"),
+    translatefilenameask = askopenfilename(filetypes=(("Text File", "*.txt"),
                                               ("All files", "*.*") ))
+    
+    amountchars = len(open(translatefilenameask).read())
+    if amountchars < 1:
+        return tk.messagebox.showerror(title='Error',message='Document is empty. Cannot translate.')
+
+    translatefilename = translatefilenameask
+
     print(translatefilename + ' selected')
     text.delete(1.0,END)
     text.insert(1.0,'Translating document')
