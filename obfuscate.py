@@ -4,6 +4,10 @@ from tkinter.simpledialog import askstring
 from tkinter.filedialog import askopenfilename
 from googletrans import Translator
 import random, json, pyperclip
+import configparser
+
+config = configparser.ConfigParser()
+config.read('assets/config.ini')
 
 mainwindow = Tk()
 mainwindow.title('Obfuscator')
@@ -17,7 +21,7 @@ proxyenabled = tk.IntVar()
 proxystring = ""
 customlanguages = ""
 translatefilename= ""
-langfilename = 'assets/languages.txt'
+langfilename = config['GENERAL']['languagefile']
 langamount = 85
 iterationsdefined = ""
 
@@ -30,7 +34,7 @@ proxytext.insert(END,'Proxy-Domain')
 def obfuscate():
     global text
     global translatefilename
-    
+
     if iterationsdefined == "":
         return tk.messagebox.showerror(title='Error', message="Please enter an amount of iterations first or specify languages")
     
@@ -42,10 +46,13 @@ def obfuscate():
         ProxyDict = {
                 'https': proxystring
                 }
+        config['PROXY']['proxyip'] = proxytext.get()
+        with open('assets/config.ini', 'w') as configfile:
+            config.write(configfile)
         translator = Translator(proxies=ProxyDict)
     else:
         translator = Translator()
-       
+        
     openedfile = open(langfilename, 'r')
     openedfileread = openedfile.read()
     customlanguagesread = openedfileread.split(', ')
@@ -128,6 +135,9 @@ def usecustomlanguagefile():
 
     customlanguagesread = openedfileread.split(', ')
     langfilename = langfilenameask
+    config['GENERAL']['languagefile'] = langfilename
+    with open('assets/config.ini', 'w') as configfile:
+        config.write(configfile)
     print('Detected ' + str(len(customlanguagesread)) + ' entries in file. Successfully set custom language file.')
 
 def filetranslate():
@@ -148,12 +158,17 @@ def filetranslate():
 def copyoutput():
     pyperclip.copy(translatedText2.text)
 
+def editproxyconfig():
+    config['PROXY']['proxyenabled'] = str(proxyenabled.get())
+    with open('assets/config.ini', 'w') as configfile:
+        config.write(configfile)
+        
 button1 = Button(mainwindow, height=1, width=100, text="Obfuscate", command=obfuscate)
 button2 = Button(mainwindow, height=1, width=100, text="Custom Languages", command=customlanguagesoption)
 buttonIT = Button(mainwindow, height=1, width=100, text="Iterations (All random)", command=iterations)
 buttonClearCS = Button(mainwindow, height=1, width=100, text="Set Custom language file", command=usecustomlanguagefile)
 buttonFileTR = Button(mainwindow, height=1, width=100, text="Translate File", command=filetranslate)
-Proxybutton = tk.Checkbutton(mainwindow)
+Proxybutton = tk.Checkbutton(mainwindow, command=editproxyconfig)
 
 button1.place(relx=0.015, rely=0.733, height=64, width=527)
 button2.place(relx=0.015, rely=0.889, height=44, width=157)
@@ -164,6 +179,12 @@ Proxybutton.configure(text="Use proxy")
 Proxybutton.configure(variable=proxyenabled, onvalue=1, offvalue=0)
 Proxybutton.place(relx=0.832, rely=0.8, relheight=0.078, relwidth=0.16)
 
+if int(config['PROXY']['proxyenabled']) == 1:
+    Proxybutton.select()
+    
+if config['PROXY']['proxyip'] != "":
+    proxytext.delete(0, END)
+    proxytext.insert(END, config['PROXY']['proxyip'])
 
 mainwindow.mainloop()
 
