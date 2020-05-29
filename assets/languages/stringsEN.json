@@ -1,0 +1,51 @@
+{
+
+  "Normal": [
+    {
+      "OutputwindowTitle": "Obfuscated text",
+      "IterationsPrompt": "Enter the amount of iterations",
+      "CustomLanguagesPrompt": "What custom languages do you want to use?",
+      "ConsoleCustomLangClear": "Cleared custom languages in case any were set.",
+      "ConsoleIterationsSet": "Number of iterations set to ",
+      "ConsoleIterationsSetAuto": "Number of iterations automatically set to ",
+      "ConsoleTranslatingTo":"Translating to language: ",
+      "ConsoleTranslatingOut": "Translation: ",
+      "ConsoleTranslatingFinalOut": "Final output: ",
+      "ConsoleTranslateDocSelected": " selected",
+      "DocumentTranslationText": "Translating document",
+      "IterationsPromptTitle": "Iterations",
+      "CustomlangPromptTitle": "Custom Languages",
+      "CustomlangfileRead1":  "Detected ",
+      "CustomlangfileRead2": " entries in file. Successfully set custom language file.",
+      "Textfilesname": "Text File",
+      "Allfilesname": "All files"
+
+    }
+  ],
+
+  "Buttons": [
+    {
+      "OutputCopy": "Copy Output",
+      "ObfuscateButton": "Obfuscate",
+      "CustomlangButton": "Custom Languages",
+      "IterationsButton": "Iterations (All random)",
+      "CustomlangFileButton": "Set Custom language file",
+      "TranslateDocButton": "Obfuscate document",
+      "UseProxyCheckbutton": "Use proxy"
+
+    }
+  ],
+
+  "Errors": [
+    {
+      "NoLanguagesOrIterations": "Please enter an amount of iterations first or specify languages.",
+      "NoTextEntered": "Please enter text before clicking the obfuscate button.",
+      "NoValidNumber": "Enter a number greater than 0.",
+      "NoValidLanguagesInput": "Input is too short to contain valid languages.",
+      "NoValidLanguagesInFile": "Text in file is too short to contain correct languages.",
+      "EmptyDocument": "Document is empty. Cannot translate.",
+      "ErrormessageTitle": "Error"
+    }
+  ]
+
+}

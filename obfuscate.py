@@ -3,11 +3,19 @@ import tkinter as tk
 from tkinter.simpledialog import askstring
 from tkinter.filedialog import askopenfilename
 from googletrans import Translator
-import random, json, pyperclip
+import random, json
 import configparser
 
 config = configparser.ConfigParser()
 config.read('assets/config.ini')
+
+with open('assets/languages/strings' + config['GENERAL']['UILanguage'] + '.json') as stringsjson:
+  stringsJSON = json.load(stringsjson)
+
+
+strings = stringsJSON['Normal'][0]
+errors = stringsJSON['Errors'][0]
+buttontext = stringsJSON['Buttons'][0]
 
 mainwindow = Tk()
 mainwindow.title('Obfuscator')
@@ -23,23 +31,25 @@ customlanguages = ""
 translatefilename= ""
 langfilename = config['GENERAL']['languagefile']
 langamount = 85
-iterationsdefined = ""
-
+iterationsdefined = False
 text = Text(mainwindow)
 text.place(relx=0.015, rely=0.022, relheight=0.698, relwidth=0.972)
 proxytext = Entry(mainwindow)
 proxytext.place(relx=0.832, rely=0.756,height=20, relwidth=0.16)
 proxytext.insert(END,'Proxy-Domain')
 
+
 def obfuscate():
     global text
     global translatefilename
+    global customnum
+    global translatedText2
 
-    if iterationsdefined == "":
-        return tk.messagebox.showerror(title='Error', message="Please enter an amount of iterations first or specify languages")
+    if iterationsdefined == False:
+        return tk.messagebox.showerror(title='Error', message=errors['NoLanguagesOrIterations'])
     
     if len(text.get('1.0', 'end')) - 1 < 1:
-       return tk.messagebox.showerror(title='Error', message="Please enter text before clicking the obfuscate button.")
+       return tk.messagebox.showerror(title='Error', message=errors['NoTextEntered'])
     
     if proxyenabled.get() == 1:
         proxystring = proxytext.get()
@@ -62,7 +72,6 @@ def obfuscate():
     else:  
         
         originalText = text.get("1.0", "end")
-    global customnum
     customnum = 0
     for i in range(numberofiterations):
         if customlanguages != "":
@@ -74,109 +83,110 @@ def obfuscate():
         else:
             languagesd = random.choice(customlanguagesread)
             
-        print('Translating to language: ' + languagesd)
+        print(strings['ConsoleTranslatingTo'] + languagesd)
         translatedText = translator.translate(originalText, dest=languagesd)
 
-        print('Output: ' + translatedText.text + '\n')
+        print(strings['ConsoleTranslatingOut'] + translatedText.text + '\n')
         originalText = translatedText.text
-        global translatedText2
         translatedText2 = translator.translate(translatedText.text, dest='en')
         
     customnum = 0
     if translatefilename != "":
         translatefilename = ""
         text.delete('1.0',END)
-    print('Final output: ' + translatedText2.text)
+    print(strings['ConsoleTranslatingFinalOut'] + translatedText2.text)
     outputwindow = Toplevel()
-    outputwindow.title("Obfuscated text")
+    outputwindow.title(strings["OutputwindowTitle"])
     outputwindow.iconbitmap('assets/icon.ico')
     TranslText = Text(outputwindow)
     TranslText.grid()
     TranslText.insert(END, translatedText2.text)
-    buttonCpy = Button(outputwindow, height=3, width=80, text="Copy Output", command=copyoutput)
+    buttonCpy = Button(outputwindow, height=3, width=80, text=buttontext["OutputCopy"], command=copyoutput)
     buttonCpy.grid()
 
 def iterations():
-    iterationsprompt = askstring('Iterations', "Enter the amount of iterations")
     global numberofiterations
     global customlanguages
     global iterationsdefined
+
+    iterationsprompt = askstring(strings['IterationsPromptTitle'], strings['IterationsPrompt'])
     numberofiterations = int(iterationsprompt)
     if numberofiterations < 1:
-        tk.messagebox.showerror(title='Error', message='Enter a number larger than 0')
+        tk.messagebox.showerror(title=errors['ErrormessageTitle'], message=errors['NoValidNumber'])
         return iterations()
         
     customlanguages = ''
-    iterationsdefined = "yes"
-    print('Cleared custom languages in case any were set')
-    print('Number of iterations set to ' + str(numberofiterations))
+    iterationsdefined = True
+    print('')
+    print(strings['ConsoleIterationsSet'] + str(numberofiterations))
 
 def customlanguagesoption():
-    customlangprompt = askstring('Custom Languages', 'What custom languages do you want to use?')
     global customlanguages
     global numberofiterations
     global iterationsdefined
+
+    customlangprompt = askstring(strings['CustomlangPromptTitle'], strings['CustomLanguagesPrompt'])
     if len(str(customlangprompt)) < 2:
-        return tk.messagebox.showerror(title='Error', message="Input is too short to contain valid languages.")
+        return tk.messagebox.showerror(title=errors['ErrormessageTitle'], message=errors['NoValidLanguagesInput'])
     customlanguages = str(customlangprompt)
     numberofiterations = len(customlanguages.split(' '))
-    iterationsdefined = "yes"
-    print('Number of iterations automatically set to ' + str(numberofiterations))
+    iterationsdefined = True
+    print(strings['ConsoleIterationsSetAuto'] + str(numberofiterations))
     
 def usecustomlanguagefile():
     global langfilename
     global langamount
+
     langfilenameask = askopenfilename(filetypes=(("Text File", "*.txt"),
                                               ("All files", "*.*") ))
     openedfile = open(langfilenameask,'r')
     openedfileread = openedfile.read()
     if len(openedfileread) < 2:
-        return tk.messagebox.showerror(title='Error', message="Text in file is too short to contain correct languages.")
+        return tk.messagebox.showerror(title=errors['ErrormessageTitle'], message=errors['NoValidLanguagesInFile'])
 
     customlanguagesread = openedfileread.split(', ')
     langfilename = langfilenameask
     config['GENERAL']['languagefile'] = langfilename
     with open('assets/config.ini', 'w') as configfile:
         config.write(configfile)
-    print('Detected ' + str(len(customlanguagesread)) + ' entries in file. Successfully set custom language file.')
+    print(strings['CustomlangfileRead1'] + str(len(customlanguagesread)) + strings['CustomlangfileRead2'])
 
 def filetranslate():
     global translatefilename
-    translatefilenameask = askopenfilename(filetypes=(("Text File", "*.txt"),
-                                              ("All files", "*.*") ))
+    translatefilenameask = askopenfilename(filetypes=((strings['Textfilesname'], "*.txt"),
+                                              (strings['Allfilesname'], "*.*") ))
     
     amountchars = len(open(translatefilenameask).read())
     if amountchars < 1:
-        return tk.messagebox.showerror(title='Error',message='Document is empty. Cannot translate.')
+        return tk.messagebox.showerror(title=errors['ErrormessageTitle'],message=errors['EmptyDocument'])
 
     translatefilename = translatefilenameask
 
-    print(translatefilename + ' selected')
+    print(translatefilename + strings['ConsoleTranslateDocSelected'])
     text.delete(1.0,END)
-    text.insert(1.0,'Translating document')
+    text.insert(1.0,strings['DocumentTranslationText'])
 
 def copyoutput():
-    pyperclip.copy(translatedText2.text)
+    mainwindow.clipboard_clear()
+    mainwindow.clipboard_append(translatedText2.text)
 
 def editproxyconfig():
     config['PROXY']['proxyenabled'] = str(proxyenabled.get())
     with open('assets/config.ini', 'w') as configfile:
         config.write(configfile)
-        
-button1 = Button(mainwindow, height=1, width=100, text="Obfuscate", command=obfuscate)
-button2 = Button(mainwindow, height=1, width=100, text="Custom Languages", command=customlanguagesoption)
-buttonIT = Button(mainwindow, height=1, width=100, text="Iterations (All random)", command=iterations)
-buttonClearCS = Button(mainwindow, height=1, width=100, text="Set Custom language file", command=usecustomlanguagefile)
-buttonFileTR = Button(mainwindow, height=1, width=100, text="Translate File", command=filetranslate)
-Proxybutton = tk.Checkbutton(mainwindow, command=editproxyconfig)
 
-button1.place(relx=0.015, rely=0.733, height=64, width=527)
-button2.place(relx=0.015, rely=0.889, height=44, width=157)
-buttonIT.place(relx=0.262, rely=0.889, height=44, width=157)
-buttonClearCS.place(relx=0.508, rely=0.889, height=44, width=157)
-buttonFileTR.place(relx=0.755, rely=0.889, height=44, width=157)
-Proxybutton.configure(text="Use proxy")
-Proxybutton.configure(variable=proxyenabled, onvalue=1, offvalue=0)
+Obfuscatebutton = Button(mainwindow, height=1, width=100, text=buttontext['ObfuscateButton'], command=obfuscate)
+Customlangbutton = Button(mainwindow, height=1, width=100, text=buttontext['CustomlangButton'], command=customlanguagesoption)
+Iterationsbutton = Button(mainwindow, height=1, width=100, text=buttontext['IterationsButton'], command=iterations)
+CustomLangFilebutton = Button(mainwindow, height=1, width=100, text=buttontext['CustomlangFileButton'], command=usecustomlanguagefile)
+TranslateDocbutton = Button(mainwindow, height=1, width=100, text=buttontext['TranslateDocButton'], command=filetranslate)
+Proxybutton = tk.Checkbutton(mainwindow, command=editproxyconfig, text=buttontext['UseProxyCheckbutton'], variable=proxyenabled, onvalue=1, offvalue=0)
+
+Obfuscatebutton.place(relx=0.015, rely=0.733, height=64, width=527)
+Customlangbutton.place(relx=0.015, rely=0.889, height=44, width=157)
+Iterationsbutton.place(relx=0.262, rely=0.889, height=44, width=157)
+CustomLangFilebutton.place(relx=0.508, rely=0.889, height=44, width=157)
+TranslateDocbutton.place(relx=0.755, rely=0.889, height=44, width=157)
 Proxybutton.place(relx=0.832, rely=0.8, relheight=0.078, relwidth=0.16)
 
 if int(config['PROXY']['proxyenabled']) == 1:
