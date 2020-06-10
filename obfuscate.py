@@ -28,7 +28,7 @@ mainwindow.resizable(1, 1)
 proxyenabled = tk.IntVar()
 proxystring = ""
 customlanguages = ""
-translatefilename= ""
+translatefilename = ""
 langfilename = config['GENERAL']['languagefile']
 langamount = 85
 iterationsdefined = False
@@ -88,12 +88,13 @@ def obfuscate():
 
         print(strings['ConsoleTranslatingOut'] + translatedText.text + '\n')
         originalText = translatedText.text
-        translatedText2 = translator.translate(translatedText.text, dest='en')
-        
+
+    translatedText2 = translator.translate(translatedText.text, dest='en')
     customnum = 0
     if translatefilename != "":
         translatefilename = ""
-        text.delete('1.0',END)
+        text["state"] = "normal"
+        text.delete(1.0, END)
     print(strings['ConsoleTranslatingFinalOut'] + translatedText2.text)
     outputwindow = Toplevel()
     outputwindow.title(strings["OutputwindowTitle"])
@@ -103,6 +104,7 @@ def obfuscate():
     TranslText.insert(END, translatedText2.text)
     buttonCpy = Button(outputwindow, height=3, width=80, text=buttontext["OutputCopy"], command=copyoutput)
     buttonCpy.grid()
+
 
 def iterations():
     global numberofiterations
@@ -131,6 +133,7 @@ def customlanguagesoption():
     customlanguages = str(customlangprompt)
     numberofiterations = len(customlanguages.split(' '))
     iterationsdefined = True
+    Iterationsbutton["state"] = "disabled"
     print(strings['ConsoleIterationsSetAuto'] + str(numberofiterations))
     
 def usecustomlanguagefile():
@@ -165,6 +168,7 @@ def filetranslate():
     print(translatefilename + strings['ConsoleTranslateDocSelected'])
     text.delete(1.0,END)
     text.insert(1.0,strings['DocumentTranslationText'])
+    text["state"] = "disabled"
 
 def copyoutput():
     mainwindow.clipboard_clear()
@@ -175,18 +179,31 @@ def editproxyconfig():
     with open('assets/config.ini', 'w') as configfile:
         config.write(configfile)
 
+def moreoptions():
+    moreoptionswindow = Toplevel()
+    moreoptionswindow.title(buttontext["MoreOptionsButton"])
+    moreoptionswindow.iconbitmap('assets/icon.ico')
+    CustomLangFilebutton = Button(moreoptionswindow, height=2, width=25, text=buttontext['CustomlangFileButton'], command=usecustomlanguagefile)
+    TranslateDocbutton = Button(moreoptionswindow, height=2, width=25, text=buttontext['TranslateDocButton'], command=filetranslate)
+    CustomLangFilebutton.grid()
+    TranslateDocbutton.grid()
+
+def resetcustomlang():
+    Iterationsbutton["state"] = "normal"
+    print('Custom languages successfully cleared.')
+
 Obfuscatebutton = Button(mainwindow, height=1, width=100, text=buttontext['ObfuscateButton'], command=obfuscate)
 Customlangbutton = Button(mainwindow, height=1, width=100, text=buttontext['CustomlangButton'], command=customlanguagesoption)
 Iterationsbutton = Button(mainwindow, height=1, width=100, text=buttontext['IterationsButton'], command=iterations)
-CustomLangFilebutton = Button(mainwindow, height=1, width=100, text=buttontext['CustomlangFileButton'], command=usecustomlanguagefile)
-TranslateDocbutton = Button(mainwindow, height=1, width=100, text=buttontext['TranslateDocButton'], command=filetranslate)
+ResetCustomlangbutton = Button(mainwindow, height=1, width=100, text=buttontext['ResetCustomLangButton'], command=resetcustomlang)
+MoreOptionsbutton = Button(mainwindow, height=1, width=100, text=buttontext['MoreOptionsButton'], command=moreoptions)
 Proxybutton = tk.Checkbutton(mainwindow, command=editproxyconfig, text=buttontext['UseProxyCheckbutton'], variable=proxyenabled, onvalue=1, offvalue=0)
 
 Obfuscatebutton.place(relx=0.015, rely=0.733, height=64, width=527)
 Customlangbutton.place(relx=0.015, rely=0.889, height=44, width=157)
-Iterationsbutton.place(relx=0.262, rely=0.889, height=44, width=157)
-CustomLangFilebutton.place(relx=0.508, rely=0.889, height=44, width=157)
-TranslateDocbutton.place(relx=0.755, rely=0.889, height=44, width=157)
+Iterationsbutton.place(relx=0.508, rely=0.889, height=44, width=157)
+ResetCustomlangbutton.place(relx=0.262, rely=0.889, height=44, width=157)
+MoreOptionsbutton.place(relx=0.755, rely=0.889, height=44, width=157)
 Proxybutton.place(relx=0.832, rely=0.8, relheight=0.078, relwidth=0.16)
 
 if int(config['PROXY']['proxyenabled']) == 1:
@@ -197,5 +214,4 @@ if config['PROXY']['proxyip'] != "":
     proxytext.insert(END, config['PROXY']['proxyip'])
 
 mainwindow.mainloop()
-
 
