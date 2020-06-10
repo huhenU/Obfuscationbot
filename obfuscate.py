@@ -197,6 +197,7 @@ def customlanguagesoption():
     print(strings['ConsoleIterationsSetAuto'] + str(numberofiterations))
     if massJSON != "":
         numberofiterations = len(customlanguages.split(' ')) * len(massJSON)
+    ResetCustomlangbutton["state"] = "normal"
     
 def usecustomlanguagefile():
     global langfilename
@@ -255,6 +256,7 @@ def moreoptions():
 def resetcustomlang():
     Iterationsbutton["state"] = "normal"
     print('Custom languages successfully cleared.')
+    ResetCustomlangbutton["state"] = "disabled"
 
 def masstranslate():
     global massJSON
@@ -284,7 +286,7 @@ Iterationsbutton.place(relx=0.508, rely=0.889, height=44, width=157)
 ResetCustomlangbutton.place(relx=0.262, rely=0.889, height=44, width=157)
 MoreOptionsbutton.place(relx=0.755, rely=0.889, height=44, width=157)
 Proxybutton.place(relx=0.832, rely=0.8, relheight=0.078, relwidth=0.16)
-
+ResetCustomlangbutton["state"] = "disabled"
 if int(config['PROXY']['proxyenabled']) == 1:
     Proxybutton.select()
     
