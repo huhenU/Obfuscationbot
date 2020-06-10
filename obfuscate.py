@@ -3,7 +3,7 @@ import tkinter as tk
 from tkinter.simpledialog import askstring
 from tkinter.filedialog import askopenfilename
 from googletrans import Translator
-import random, json
+import random, json, os
 import configparser
 
 config = configparser.ConfigParser()
@@ -29,6 +29,8 @@ proxyenabled = tk.IntVar()
 proxystring = ""
 customlanguages = ""
 translatefilename = ""
+translatedText2final = ""
+massJSON = ""
 langfilename = config['GENERAL']['languagefile']
 langamount = 85
 iterationsdefined = False
@@ -38,13 +40,29 @@ proxytext = Entry(mainwindow)
 proxytext.place(relx=0.832, rely=0.756,height=20, relwidth=0.16)
 proxytext.insert(END,'Proxy-Domain')
 
+def tail(file, n=1, bs=1024):
+    f = open(file)
+    f.seek(0,2)
+    l = 1-f.read(1).count('\n')
+    B = f.tell()
+    while n >= l and B > 0:
+            block = min(bs, B)
+            B -= block
+            f.seek(B, 0)
+            l += f.read(block).count('\n')
+    f.seek(B, 0)
+    l = min(l,n)
+    lines = f.readlines()[-l:]
+    f.close()
+    return lines
 
 def obfuscate():
     global text
     global translatefilename
     global customnum
     global translatedText2
-
+    global translatedText2final
+    global massJSON
     if iterationsdefined == False:
         return tk.messagebox.showerror(title='Error', message=errors['NoLanguagesOrIterations'])
     
@@ -73,6 +91,7 @@ def obfuscate():
         
         originalText = text.get("1.0", "end")
     customnum = 0
+    massJSONnum = 1
     for i in range(numberofiterations):
         if customlanguages != "":
             forcelanguage = customlanguages.split(' ')
@@ -82,16 +101,39 @@ def obfuscate():
             customnum += 1
         else:
             languagesd = random.choice(customlanguagesread)
-            
-        print(strings['ConsoleTranslatingTo'] + languagesd)
-        translatedText = translator.translate(originalText, dest=languagesd)
 
-        print(strings['ConsoleTranslatingOut'] + translatedText.text + '\n')
-        originalText = translatedText.text
+        if massJSON != "":
+            originalText = massJSON[str(massJSONnum)]
+            print(strings['ConsoleTranslatingTo'] + languagesd)
+            translatedText = translator.translate(originalText, dest=languagesd)
 
-    translatedText2 = translator.translate(translatedText.text, dest='en')
+            print(strings['ConsoleTranslatingOut'] + translatedText.text + '\n')
+            originalText = translatedText.text
+            translatedText2 = translator.translate(translatedText.text, dest='en')
+            translatedText2final += str(massJSONnum) + ": " + translatedText2.text + '\n'
+            writetempfile = open("assets/temp.txt", "w+")
+            writetempfile.write(translatedText2final)
+            writetempfile.close()
+            if massJSONnum < len(massJSON):
+                massJSONnum += 1
+            else:
+                massJSONnum = 1
+
+        else:
+            print(strings['ConsoleTranslatingTo'] + languagesd)
+            translatedText = translator.translate(originalText, dest=languagesd)
+
+            print(strings['ConsoleTranslatingOut'] + translatedText.text + '\n')
+            originalText = translatedText.text
+
+            translatedText2 = translator.translate(translatedText.text, dest='en')
+
     customnum = 0
     if translatefilename != "":
+        translatefilename = ""
+        text["state"] = "normal"
+        text.delete(1.0, END)
+    if massJSON != "":
         translatefilename = ""
         text["state"] = "normal"
         text.delete(1.0, END)
@@ -101,15 +143,27 @@ def obfuscate():
     outputwindow.iconbitmap('assets/icon.ico')
     TranslText = Text(outputwindow)
     TranslText.grid()
-    TranslText.insert(END, translatedText2.text)
-    buttonCpy = Button(outputwindow, height=3, width=80, text=buttontext["OutputCopy"], command=copyoutput)
-    buttonCpy.grid()
+    if massJSON != "":
+        outmass = tail("assets/temp.txt", len(massJSON))
+        final_outmass = ','.join(outmass)
+        outputfile = open("output.txt", "w+")
+        outputfile.write(final_outmass.replace(",", ""))
+        outputfile.close()
+        os.remove("assets/temp.txt")
+        TranslText.insert(END, "See output file")
+    else:
+        TranslText.insert(END, translatedText2.text)
+        buttonCpy = Button(outputwindow, height=3, width=80, text=buttontext["OutputCopy"], command=copyoutput)
+        buttonCpy.grid()
+    massJSON = ""
+    translatedText2final = ""
 
 
 def iterations():
     global numberofiterations
     global customlanguages
     global iterationsdefined
+    global massJSON
 
     iterationsprompt = askstring(strings['IterationsPromptTitle'], strings['IterationsPrompt'])
     numberofiterations = int(iterationsprompt)
@@ -121,11 +175,17 @@ def iterations():
     iterationsdefined = True
     print('')
     print(strings['ConsoleIterationsSet'] + str(numberofiterations))
+    if massJSON != "":
+        numberofiterations = int(iterationsprompt) * len(massJSON)
+
+
+
 
 def customlanguagesoption():
     global customlanguages
     global numberofiterations
     global iterationsdefined
+    global massJSON
 
     customlangprompt = askstring(strings['CustomlangPromptTitle'], strings['CustomLanguagesPrompt'])
     if len(str(customlangprompt)) < 2:
@@ -135,6 +195,8 @@ def customlanguagesoption():
     iterationsdefined = True
     Iterationsbutton["state"] = "disabled"
     print(strings['ConsoleIterationsSetAuto'] + str(numberofiterations))
+    if massJSON != "":
+        numberofiterations = len(customlanguages.split(' ')) * len(massJSON)
     
 def usecustomlanguagefile():
     global langfilename
@@ -185,12 +247,29 @@ def moreoptions():
     moreoptionswindow.iconbitmap('assets/icon.ico')
     CustomLangFilebutton = Button(moreoptionswindow, height=2, width=25, text=buttontext['CustomlangFileButton'], command=usecustomlanguagefile)
     TranslateDocbutton = Button(moreoptionswindow, height=2, width=25, text=buttontext['TranslateDocButton'], command=filetranslate)
+    MassTranslateDocbutton = Button(moreoptionswindow, height=2, width=25, text=buttontext['MassTranslateDocButton'], command=masstranslate)
     CustomLangFilebutton.grid()
     TranslateDocbutton.grid()
+    MassTranslateDocbutton.grid()
 
 def resetcustomlang():
     Iterationsbutton["state"] = "normal"
     print('Custom languages successfully cleared.')
+
+def masstranslate():
+    global massJSON
+    translatefilenameask = askopenfilename(filetypes=((strings['JSONfilesname'], "*.json"),
+                                                      (strings['Allfilesname'], "*.*")))
+
+    with open(translatefilenameask) as massfile:
+        massJSON = json.load(massfile)
+    if len(massJSON) < 1:
+        return tk.messagebox.showerror(title=errors['ErrormessageTitle'], message=errors['EmptyDocument'])
+
+    print(translatefilenameask + strings['ConsoleTranslateDocSelected'])
+    text.delete(1.0, END)
+    text.insert(1.0, strings['DocumentMassTranslationText'])
+    text["state"] = "disabled"
 
 Obfuscatebutton = Button(mainwindow, height=1, width=100, text=buttontext['ObfuscateButton'], command=obfuscate)
 Customlangbutton = Button(mainwindow, height=1, width=100, text=buttontext['CustomlangButton'], command=customlanguagesoption)
