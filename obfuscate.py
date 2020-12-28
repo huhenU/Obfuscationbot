@@ -1,10 +1,11 @@
 from tkinter import *
 import tkinter as tk
 from tkinter.simpledialog import askstring
+from tkinter import filedialog
 from googletrans import Translator
 import random
 
-
+obfuscatedoc = 0
 translator = Translator()
 mainwindow = Tk()
 mainwindow.title('Obfuscator')
@@ -25,8 +26,14 @@ with open('assets/languages.txt', 'rb') as languagefile:
 def obfuscate():
     global iterations
     global customlanguages
+    global document
+    global obfuscatedoc
 
-    inputtext = text.get('1.0', END)
+    if obfuscatedoc == 1:
+        inputtext = document
+    else:
+        inputtext = text.get('1.0', END)
+
     for i in range(0, iterations + 1):
         if i == iterations:
             destlanguage = 'en'
@@ -44,6 +51,11 @@ def obfuscate():
         inputtext = translate.text
         if i == iterations:
             outputwindow(translate.text)
+
+            if obfuscatedoc == 1:
+                text['state'] = 'normal'
+                text.delete('1.0', END)
+                obfuscatedoc = 0
 
 
 def iterations():
@@ -70,6 +82,7 @@ def outputwindow(output):
     TranslText = Text(outputwindow)
     TranslText.grid()
     TranslText.insert(END, output)
+    TranslText['state'] = 'disabled'
     buttonCpy = Button(outputwindow, height=3, width=80, text="Copy output", command=copyoutput(output))
     buttonCpy.grid()
 
@@ -79,8 +92,25 @@ def copyoutput(output):
     mainwindow.clipboard_append(output)
 
 
+def obfuscatedocument():
+    global document
+    global obfuscatedoc
+
+    document = tk.filedialog.askopenfilename(filetypes=(("Text file", "*.txt"), ("All files", "*.*") ))
+    with open(document, 'r') as document:
+        document = document.read()
+        obfuscatedoc = 1
+        text.delete('1.0', END)
+        text.insert(END, 'Obfuscating document')
+        text['state'] = 'disabled'
+
+
 def moreoptions():
-    print("Not finished yet")
+    optionswindow = Toplevel()
+    optionswindow.title("Options")
+    optionswindow.iconbitmap('assets/icon.ico')
+    buttondcmt = Button(optionswindow, height=3, width=25, text="Obfuscate Document", command=obfuscatedocument)
+    buttondcmt.grid()
 
 
 Obfuscatebutton = Button(mainwindow, height=1, width=100, text='Obfuscate', command=obfuscate)
